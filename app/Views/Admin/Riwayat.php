@@ -6,14 +6,8 @@
 </head>
 <body class="bg-slate-900 text-white">
 
-<nav class="bg-slate-800 px-8 py-4 flex justify-between">
-    <h1 class="text-xl font-bold text-purple-400">Admin Panel</h1>
-    <div class="space-x-4">
-        <a href="/admin" class="hover:text-purple-400">Konser</a>
-        <a href="/admin/riwayat" class="text-purple-400">Riwayat</a>
-        <a href="/logout" class="text-red-400">Logout</a>
-    </div>
-</nav>
+<!-- NAVBAR GLOBAL (AUTO ADMIN / USER / GUEST) -->
+<?= view('layout/navbar') ?>
 
 <div class="max-w-7xl mx-auto px-6 py-10">
 
@@ -46,16 +40,16 @@
         </div>
     </div>
 
-    <!-- Table -->
-    <div class="bg-slate-800 rounded-xl overflow-hidden">
+    <!-- Table Riwayat -->
+    <div class="bg-slate-800 rounded-xl overflow-hidden shadow">
         <table class="w-full text-sm">
             <thead class="bg-slate-700">
                 <tr>
                     <th class="p-3 text-left">User</th>
                     <th class="p-3 text-left">Konser</th>
-                    <th class="p-3">Jumlah</th>
-                    <th class="p-3">Total</th>
-                    <th class="p-3">Status</th>
+                    <th class="p-3 text-center">Jumlah</th>
+                    <th class="p-3 text-center">Total</th>
+                    <th class="p-3 text-center">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -69,11 +63,17 @@
                     </td>
                     <td class="p-3 text-center">
                         <?php if($p['status'] == 'paid'): ?>
-                            <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs">Paid</span>
+                            <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs">
+                                Paid
+                            </span>
                         <?php elseif($p['status'] == 'pending'): ?>
-                            <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs">Pending</span>
+                            <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs">
+                                Pending
+                            </span>
                         <?php else: ?>
-                            <span class="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs">Cancelled</span>
+                            <span class="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs">
+                                Cancelled
+                            </span>
                         <?php endif; ?>
                     </td>
                 </tr>

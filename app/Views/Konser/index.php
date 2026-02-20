@@ -7,15 +7,8 @@
 </head>
 <body class="bg-slate-900 text-white">
 
-<!-- Navbar -->
-<nav class="bg-slate-800 px-8 py-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold text-purple-400">SoraiFest</h1>
-    <div class="space-x-4">
-        <a href="/konser" class="text-purple-400">Konser</a>
-        <a href="/pesanan-saya" class="hover:text-purple-400">Pesanan Saya</a>
-        <a href="/logout" class="text-red-400 hover:text-red-500">Logout</a>
-    </div>
-</nav>
+<!-- PANGGIL NAVBAR GLOBAL -->
+<?= view('layout/navbar') ?>
 
 <!-- Hero -->
 <section class="text-center py-20 bg-gradient-to-b from-purple-900 to-slate-900">
@@ -28,6 +21,12 @@
 
 <?php foreach($konser as $k): ?>
 <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:scale-105 transition">
+
+    <img 
+        src="<?= base_url('uploads/gambar/' . $k['gambar']) ?>" 
+        alt="<?= $k['name_konser'] ?>"
+        class="w-full h-48 object-cover rounded-lg mb-3">
+
     <div class="p-6">
         <h3 class="text-xl font-bold text-purple-400 mb-2">
             <?= $k['name_konser'] ?>
@@ -35,10 +34,12 @@
         <p class="text-slate-300">📍 <?= $k['lokasi'] ?></p>
         <p class="text-slate-300">📅 <?= $k['tanggal'] ?></p>
         <p class="text-slate-300">💰 Rp <?= number_format($k['harga']) ?></p>
-        <p class="text-slate-400 text-sm">Sisa tiket: <?= $k['jumlah_bed'] ?></p>
+        <p class="text-slate-400 text-sm">
+            Sisa tiket: <?= $k['jumlah_bed'] ?>
+        </p>
 
         <a href="/konser/<?= $k['id'] ?>" 
-           class="inline-block mt-4 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded">
+           class="inline-block mt-4 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded font-semibold">
            Lihat Detail
         </a>
     </div>

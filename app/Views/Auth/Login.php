@@ -41,12 +41,20 @@
             </button>
         </form>
 
+        <!-- REGISTER -->
         <p class="text-center text-sm text-slate-400 mt-6">
             Belum punya akun?
             <a href="/register" class="text-purple-400 hover:underline">
                 Daftar di sini
             </a>
         </p>
+
+        <!-- BACK TO KONSER (UNTUK GUEST) -->
+        <a href="/konser"
+           class="block text-center mt-4 bg-slate-700 hover:bg-slate-600 py-3 rounded font-semibold transition">
+           ← Kembali ke Daftar Konser
+        </a>
+
     </div>
 </div>
 

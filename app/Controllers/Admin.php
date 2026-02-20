@@ -56,16 +56,33 @@ class Admin extends BaseController
     {
         $this->auth();
 
+        // Ambil file gambar dari form
+        $fileGambar = $this->request->getFile('gambar');
+
+        $namaFile = null;
+
+        // Jika ada file diupload
+        if ($fileGambar && $fileGambar->isValid() && !$fileGambar->hasMoved()) {
+            
+            // Generate nama random biar tidak bentrok
+            $namaFile = $fileGambar->getRandomName();
+
+            // Pindahkan ke public/uploads/gambar
+            $fileGambar->move('uploads/gambar', $namaFile);
+        }
+
         $this->konserModel->save([
             'name_konser' => $this->request->getPost('name_konser'),
             'lokasi'      => $this->request->getPost('lokasi'),
             'tanggal'     => $this->request->getPost('tanggal'),
             'harga'       => $this->request->getPost('harga'),
             'jumlah_bed'  => $this->request->getPost('jumlah_bed'),
+            'gambar'      => $namaFile, // INI YANG BARU
         ]);
 
-        return redirect()->to('/admin');
-    }
+        return redirect()->to('/admin')->with('success', 'Konser berhasil ditambahkan!');
+}
+
 
     public function edit($id)
     {
@@ -74,20 +91,49 @@ class Admin extends BaseController
         return view('admin/edit', $data);
     }
 
-    public function update($id)
-    {
-        $this->auth();
+public function update($id)
+{
+    $this->auth();
 
-        $this->konserModel->update($id, [
-            'name_konser' => $this->request->getPost('name_konser'),
-            'lokasi'      => $this->request->getPost('lokasi'),
-            'tanggal'     => $this->request->getPost('tanggal'),
-            'harga'       => $this->request->getPost('harga'),
-            'jumlah_bed'  => $this->request->getPost('jumlah_bed'),
-        ]);
+    // Ambil data konser lama
+    $konserLama = $this->konserModel->find($id);
 
-        return redirect()->to('/admin');
+    // Ambil file gambar dari form
+    $fileGambar = $this->request->getFile('gambar');
+
+    // Default pakai gambar lama
+    $namaFile = $konserLama['gambar'];
+
+    // Jika admin upload gambar baru
+    if ($fileGambar && $fileGambar->isValid() && !$fileGambar->hasMoved()) {
+
+        // Generate nama random
+        $namaFileBaru = $fileGambar->getRandomName();
+
+        // Pindahkan ke folder public/uploads/gambar
+        $fileGambar->move('uploads/gambar', $namaFileBaru);
+
+        // Hapus gambar lama (jika ada)
+        if (!empty($konserLama['gambar']) && file_exists('uploads/gambar/' . $konserLama['gambar'])) {
+            unlink('uploads/gambar/' . $konserLama['gambar']);
+        }
+
+        // Gunakan gambar baru
+        $namaFile = $namaFileBaru;
     }
+
+    // Update data ke database
+    $this->konserModel->update($id, [
+        'name_konser' => $this->request->getPost('name_konser'),
+        'lokasi'      => $this->request->getPost('lokasi'),
+        'tanggal'     => $this->request->getPost('tanggal'),
+        'harga'       => $this->request->getPost('harga'),
+        'jumlah_bed'  => $this->request->getPost('jumlah_bed'),
+        'gambar'      => $namaFile, // penting!
+    ]);
+
+    return redirect()->to('/admin')->with('success', 'Konser berhasil diupdate!');
+}
 
     public function delete($id)
     {

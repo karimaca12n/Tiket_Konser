@@ -10,8 +10,21 @@ class Pemesanan extends BaseController {
     // USER - FORM PESAN
     // =======================
     public function form($id) {
+
+        // CEK LOGIN (GUEST TIDAK BOLEH PESAN)
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login')
+                ->with('error', 'Silakan login terlebih dahulu untuk memesan tiket');
+        }
+
         $konserModel = new KonserModel();
         $data['konser'] = $konserModel->find($id);
+
+        // jika konser tidak ditemukan
+        if (!$data['konser']) {
+            return redirect()->to('/konser');
+        }
+
         return view('pemesanan/form', $data);
     }
 
@@ -19,6 +32,12 @@ class Pemesanan extends BaseController {
     // USER - SUBMIT PESANAN
     // =======================
     public function submit() {
+
+        // CEK LOGIN
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
         $pemesananModel = new PemesananModel();
         $konserModel = new KonserModel();
 
@@ -26,17 +45,23 @@ class Pemesanan extends BaseController {
         $jumlah = (int)$this->request->getPost('jumlah');
 
         $konser = $konserModel->find($konser_id);
+
+        // validasi konser
+        if (!$konser) {
+            return redirect()->to('/konser');
+        }
+
         $total = $jumlah * $konser['harga'];
 
         $pemesananModel->insert([
-            'user_id' => session()->get('user_id'),
-            'konser_id' => $konser_id,
+            'user_id'      => session()->get('user_id'),
+            'konser_id'    => $konser_id,
             'jumlah_tiket' => $jumlah,
-            'total_harga' => $total,
-            'status' => 'pending'
+            'total_harga'  => $total,
+            'status'       => 'pending'
         ]);
 
-        // kurangi stok
+        // kurangi stok (sesuai field kamu: jumlah_bed)
         $konserModel->update($konser_id, [
             'jumlah_bed' => $konser['jumlah_bed'] - $jumlah
         ]);
@@ -45,11 +70,18 @@ class Pemesanan extends BaseController {
     }
 
     // =======================
-    // USER - RIWAYAT PESANAN
+    // USER - RIWAYAT PESANAN (PER AKUN)
     // =======================
     public function riwayat() {
+
+        // HARUS LOGIN
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
         $model = new PemesananModel();
         $data['pesanan'] = $model->getRiwayat(session()->get('user_id'));
+
         return view('pemesanan/riwayat', $data);
     }
 
@@ -58,6 +90,11 @@ class Pemesanan extends BaseController {
     // =======================
     public function payment($id)
     {
+        // HARUS LOGIN
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
         $model = new PemesananModel();
 
         $pesanan = $model
@@ -66,7 +103,12 @@ class Pemesanan extends BaseController {
             ->where('pemesanan.id', $id)
             ->first();
 
-        // keamanan: hanya pemilik pesanan
+        // jika pesanan tidak ada
+        if (!$pesanan) {
+            return redirect()->to('/pesanan-saya');
+        }
+
+        // keamanan: hanya pemilik pesanan yang bisa akses
         if ($pesanan['user_id'] != session()->get('user_id')) {
             return redirect()->to('/pesanan-saya');
         }
@@ -81,7 +123,24 @@ class Pemesanan extends BaseController {
     // =======================
     public function process($id)
     {
+        // HARUS LOGIN
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
         $model = new PemesananModel();
+
+        $pesanan = $model->find($id);
+
+        // validasi pesanan
+        if (!$pesanan) {
+            return redirect()->to('/pesanan-saya');
+        }
+
+        // keamanan: hanya pemilik pesanan
+        if ($pesanan['user_id'] != session()->get('user_id')) {
+            return redirect()->to('/pesanan-saya');
+        }
 
         $model->update($id, [
             'status' => 'paid'
@@ -91,10 +150,15 @@ class Pemesanan extends BaseController {
     }
 
     // =======================
-    // USER - TIKET (PDF NANTI)
+    // USER - TIKET
     // =======================
     public function tiket($id)
     {
+        // HARUS LOGIN
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
         $model = new PemesananModel();
 
         $pesanan = $model
@@ -102,6 +166,16 @@ class Pemesanan extends BaseController {
             ->join('konser', 'konser.id = pemesanan.konser_id')
             ->where('pemesanan.id', $id)
             ->first();
+
+        // jika tidak ada
+        if (!$pesanan) {
+            return redirect()->to('/pesanan-saya');
+        }
+
+        // keamanan: hanya pemilik tiket
+        if ($pesanan['user_id'] != session()->get('user_id')) {
+            return redirect()->to('/pesanan-saya');
+        }
 
         return view('pemesanan/tiket', [
             'pesanan' => $pesanan

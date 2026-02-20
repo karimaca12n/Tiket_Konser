@@ -6,14 +6,8 @@
 </head>
 <body class="bg-slate-900 text-white min-h-screen">
 
-<nav class="bg-slate-800 px-8 py-4 flex justify-between">
-    <h1 class="text-xl font-bold text-purple-400">Admin Panel</h1>
-    <div class="space-x-4">
-        <a href="/admin" class="hover:text-purple-400">Dashboard</a>
-        <a href="/admin/riwayat" class="hover:text-purple-400">Riwayat</a>
-        <a href="/logout" class="text-red-400">Logout</a>
-    </div>
-</nav>
+<!-- NAVBAR GLOBAL (AUTO ADMIN / USER / GUEST) -->
+<?= view('layout/navbar') ?>
 
 <div class="max-w-xl mx-auto mt-16 bg-slate-800 p-8 rounded-xl shadow">
 
@@ -21,7 +15,8 @@
         Tambah Konser
     </h2>
 
-    <form action="/admin/store" method="post" class="space-y-4">
+    <form action="/admin/store" method="post" enctype="multipart/form-data" class="space-y-4">
+
 
         <div>
             <label class="text-sm text-slate-300">Nama Konser</label>
@@ -53,10 +48,17 @@
                 class="w-full mt-1 px-3 py-2 bg-slate-700 rounded focus:outline-none focus:ring-2 focus:ring-purple-500">
         </div>
 
+        <div>
+            <label class="text-sm text-slate-300">Gambar Konser</label>
+            <input type="file" name="gambar" accept="image/*" required
+                class="w-full mt-1 px-3 py-2 bg-slate-700 rounded focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+
         <div class="flex justify-between pt-4">
             <a href="/admin" 
                class="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded">
-               ← Batal
+               ← Kembali ke Dashboard
             </a>
 
             <button 

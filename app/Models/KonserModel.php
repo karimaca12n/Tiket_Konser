@@ -13,6 +13,7 @@ class KonserModel extends Model
         'lokasi',
         'tanggal',
         'harga',
-        'jumlah_bed'
+        'jumlah_bed',
+        'gambar'
     ];
 }
