@@ -6,17 +6,10 @@
 </head>
 <body class="bg-slate-900 text-white min-h-screen">
 
-<!-- NAVBAR USER -->
-<nav class="bg-slate-800 px-8 py-4 flex justify-between">
-    <h1 class="text-xl font-bold text-purple-400">SoraiFest</h1>
-    <div class="space-x-4">
-        <a href="/konser" class="hover:text-purple-400">Konser</a>
-        <a href="/pesanan-saya" class="text-purple-400">Pesanan Saya</a>
-        <a href="/logout" class="text-red-400">Logout</a>
-    </div>
-</nav>
+<!-- NAVBAR GLOBAL (AUTO ADMIN / USER / GUEST) -->
+<?= view('layout/navbar') ?>
 
-<div class="max-w-5xl mx-auto mt-12">
+<div class="max-w-5xl mx-auto mt-12 px-6">
 
     <h2 class="text-3xl font-bold text-purple-400 mb-6">
         Riwayat Pemesanan Saya
@@ -58,6 +51,10 @@
                             <span class="bg-green-600 px-3 py-1 rounded text-sm">
                                 Paid
                             </span>
+                        <?php else: ?>
+                            <span class="bg-red-600 px-3 py-1 rounded text-sm">
+                                Cancelled
+                            </span>
                         <?php endif ?>
                     </td>
 
@@ -72,6 +69,8 @@
                                class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm">
                                 Download Tiket
                             </a>
+                        <?php else: ?>
+                            <span class="text-slate-400 text-sm">-</span>
                         <?php endif ?>
                     </td>
 

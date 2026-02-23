@@ -17,7 +17,6 @@ $routes->get('/register', 'Auth::register');           // halaman register
 $routes->post('/register', 'Auth::registerProcess');   // proses register
 $routes->get('/logout', 'Auth::logout');               // logout user
 
-
 // =======================
 // USER / CUSTOMER
 // =======================
@@ -48,3 +47,7 @@ $routes->get('/admin/edit/(:num)', 'Admin::edit/$1');  // edit konser
 $routes->post('/admin/update/(:num)', 'Admin::update/$1'); // update konser
 $routes->get('/admin/delete/(:num)', 'Admin::delete/$1'); // hapus konser
 $routes->get('/admin/riwayat', 'Admin::riwayat');      // riwayat penjualan
+
+$routes->group('api', function($routes) {
+    $routes->resource('konser', ['controller' => 'Api\KonserApi']);
+});

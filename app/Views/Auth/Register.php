@@ -25,7 +25,13 @@
         <form action="/register" method="post" class="space-y-4">
             <div>
                 <label class="text-sm">Nama</label>
-                <input type="text" name="name" required
+                <input type="text" name="nama" required
+                    class="w-full mt-1 px-4 py-3 rounded bg-slate-900 border border-slate-700 focus:outline-none focus:border-purple-500">
+            </div>
+
+            <div>
+                <label class="text-sm">Username</label>
+                <input type="text" name="username" required
                     class="w-full mt-1 px-4 py-3 rounded bg-slate-900 border border-slate-700 focus:outline-none focus:border-purple-500">
             </div>
 
