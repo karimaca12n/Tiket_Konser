@@ -192,3 +192,9 @@ td pre {
 .args {
     display: none;
 }
+
+/* helper utilities for inline-width removal */
+.td-width-10em { width: 10em; }
+.td-width-12em { width: 12em; }
+.td-width-15em { width: 15em; }
+.table-full { width: 100%; }
