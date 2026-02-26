@@ -58,8 +58,8 @@
             <div class="relative h-56 overflow-hidden">
                 <img alt="<?= esc($k['name_konser']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="<?= base_url('uploads/gambar/' . $k['gambar']) ?>" />
                 <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg flex flex-col items-center">
-                    <span class="text-xs font-bold text-slate-400 uppercase leading-none">OCT</span>
-                    <span class="text-xl font-bold text-slate-900 leading-none">12</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase leading-none"></span>
+                    <span class="text-xl font-bold text-slate-900 leading-none"></span>
                 </div>
             </div>
             <div class="p-6">

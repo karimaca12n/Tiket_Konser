@@ -79,8 +79,12 @@
                                 ⏳ Menunggu Pembayaran
                             </span>
                         <?php elseif($p['status'] == 'paid'): ?>
+                            <span class="px-4 py-2 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-lg text-sm font-semibold mb-4">
+                                💳 Sudah Dibayar (Menunggu Approval)
+                            </span>
+                        <?php elseif($p['status'] == 'approved'): ?>
                             <span class="px-4 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg text-sm font-semibold mb-4">
-                                ✓ Dibayar
+                                ✓ Approved - Siap Cetak
                             </span>
                         <?php else: ?>
                             <span class="px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg text-sm font-semibold mb-4">
@@ -94,8 +98,12 @@
                                 Lanjut Bayar
                             </a>
                         <?php elseif($p['status'] == 'paid'): ?>
-                            <a href="/pemesanan/tiket/<?= $p['id'] ?>" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all text-sm">
-                                Lihat Tiket
+                            <a href="/pemesanan/tiket/<?= $p['id'] ?>" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all text-sm cursor-not-allowed opacity-50" disabled>
+                                Tunggu Approval Admin
+                            </a>
+                        <?php elseif($p['status'] == 'approved'): ?>
+                            <a href="/pemesanan/tiket/<?= $p['id'] ?>" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all text-sm">
+                                Download E-Ticket
                             </a>
                         <?php else: ?>
                             <span class="text-slate-500 text-sm">-</span>

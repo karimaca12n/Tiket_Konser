@@ -11,7 +11,9 @@ class PemesananModel extends Model {
         'konser_id',
         'jumlah_tiket',
         'total_harga',
-        'status'
+        'status',
+        'approved_at',
+        'approved_by'
     ];
 
     // Riwayat milik user (yang sudah ada)
@@ -25,6 +27,22 @@ class PemesananModel extends Model {
             ->join('konser', 'konser.id = pemesanan.konser_id')
             ->where('pemesanan.user_id', $user_id)
             ->findAll();
+    }
+
+    // Detail pesanan beserta data konser (dipakai pas cetak PDF)
+    public function getDetailWithKonser($id)
+    {
+        return $this->select('
+                        pemesanan.*, 
+                        konser.name_konser,
+                        konser.lokasi,
+                        konser.tanggal,
+                        konser.gambar,
+                        konser.harga
+                    ')
+                    ->join('konser', 'konser.id = pemesanan.konser_id')
+                    ->where('pemesanan.id', $id)
+                    ->first();
     }
 
     // ===== UNTUK ADMIN =====

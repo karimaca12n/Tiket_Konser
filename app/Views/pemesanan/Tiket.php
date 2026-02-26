@@ -42,7 +42,7 @@
         <!-- Order Info -->
         <div class="bg-slate-900 rounded-xl p-6 mb-6 border border-slate-700 text-left space-y-3">
             <div class="flex justify-between">
-                <span class="text-slate-400">Konser</span>
+                <span class="text-slate-400">Konser:</span>
                 <span class="font-semibold text-primary"><?= esc($pesanan['name_konser']) ?></span>
             </div>
             <div class="flex justify-between">
@@ -61,7 +61,21 @@
         </div>
 
         <!-- Action Button -->
-        <a href="/pesanan-saya" class="block w-full py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-all">
+        <div id="action-button" data-status="<?= $pesanan['status'] ?>">
+            <?php if($pesanan['status'] == 'approved'): ?>
+                <a href="/pemesanan/cetak/<?= $pesanan['id'] ?>" 
+                class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition-all mb-3 inline-block text-center">
+                Download E-Ticket (PDF)
+                </a>
+            <?php else: ?>
+                <div class="block w-full py-3 bg-yellow-600 text-white font-bold rounded-lg mb-3 cursor-not-allowed text-center">
+                    ⏳ Menunggu Approval Admin
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <a href="/pesanan-saya" 
+           class="block w-full py-3 bg-primary/20 hover:bg-primary/30 text-white font-bold rounded-lg transition-all">
             Lihat Riwayat Pemesanan
         </a>
     </div>

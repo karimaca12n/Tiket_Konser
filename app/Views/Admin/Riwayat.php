@@ -6,7 +6,6 @@
 </head>
 <body class="bg-slate-900 text-white">
 
-<!-- NAVBAR GLOBAL (AUTO ADMIN / USER / GUEST) -->
 <?= view('layout/navbar') ?>
 
 <div class="max-w-7xl mx-auto px-6 py-10">
@@ -50,30 +49,45 @@
                     <th class="p-3 text-center">Jumlah</th>
                     <th class="p-3 text-center">Total</th>
                     <th class="p-3 text-center">Status</th>
+                    <th class="p-3 text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach($pesanan as $p): ?>
                 <tr class="border-b border-slate-700 hover:bg-slate-700/50">
-                    <td class="p-3"><?= $p['username'] ?></td>
-                    <td class="p-3"><?= $p['name_konser'] ?></td>
+                    <td class="p-3"><?= esc($p['username']) ?></td>
+                    <td class="p-3"><?= esc($p['name_konser']) ?></td>
                     <td class="p-3 text-center"><?= $p['jumlah_tiket'] ?></td>
                     <td class="p-3 text-center">
                         Rp <?= number_format($p['total_harga']) ?>
                     </td>
                     <td class="p-3 text-center">
+                        <?php if($p['status'] == 'pending'): ?>
+                            <span class="bg-yellow-600 px-3 py-1 rounded text-sm">Pending</span>
+                        <?php elseif($p['status'] == 'paid'): ?>
+                            <span class="bg-blue-600 px-3 py-1 rounded text-sm">
+                                Paid (Menunggu Approval)
+                            </span>
+                        <?php elseif($p['status'] == 'approved'): ?>
+                            <span class="bg-green-600 px-3 py-1 rounded text-sm">Approved</span>
+                        <?php elseif($p['status'] == 'cancelled'): ?>
+                            <span class="bg-red-600 px-3 py-1 rounded text-sm">Cancelled</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="p-3 text-center">
                         <?php if($p['status'] == 'paid'): ?>
-                            <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs">
-                                Paid
-                            </span>
-                        <?php elseif($p['status'] == 'pending'): ?>
-                            <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs">
-                                Pending
-                            </span>
+                            <a href="/admin/approve/<?= $p['id'] ?>"
+                               onclick="return confirm('Approve pembayaran ini?')"
+                               class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm mr-2">
+                               Approve
+                            </a>
+                            <a href="/admin/reject/<?= $p['id'] ?>"
+                               onclick="return confirm('Tolak pembayaran ini?')"
+                               class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm">
+                               Reject
+                            </a>
                         <?php else: ?>
-                            <span class="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs">
-                                Cancelled
-                            </span>
+                            <span class="text-slate-500 text-sm">-</span>
                         <?php endif; ?>
                     </td>
                 </tr>
