@@ -35,12 +35,23 @@ class CreatePemesananTable extends Migration
             ],
             'status' => [
                 'type' => 'ENUM',
-                'constraint' => ['pending', 'paid', 'cancelled'],
+                'constraint' => ['pending', 'paid', 'approved', 'cancelled'],
                 'default' => 'pending',
             ],
-            'created_at' => [
+            'approved_at' => [
                 'type' => 'TIMESTAMP',
                 'null' => true,
+            ],
+            'approved_by' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'unsigned' => true,                
+                'null' => true,
+            ],
+            'created_at' => [
+                'type'    => 'TIMESTAMP',
+                'null'    => false,
+                'default' => 'CURRENT_TIMESTAMP',
             ],
         ]);
 
@@ -53,6 +64,6 @@ class CreatePemesananTable extends Migration
 
     public function down()
     {
-        //
+        $this->forge->dropTable('pemesanan');
     }
 }
