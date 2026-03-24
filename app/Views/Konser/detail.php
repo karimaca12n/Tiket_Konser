@@ -69,7 +69,7 @@
         </h1>
 
         <!-- Info Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pb-8 border-b border-slate-700">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 pb-8 border-b border-slate-700">
             <div class="flex items-start gap-4">
                 <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
                     <span class="material-icons">calendar_today</span>

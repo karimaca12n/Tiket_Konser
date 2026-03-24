@@ -73,6 +73,23 @@ $routes->get('/admin/reject/(:num)', 'Admin::reject/$1');
 // =======================
 // API (OPSIONAL)
 // =======================
+
 $routes->group('api', function ($routes) {
+    // Tambahkan ini untuk Auth
+    $routes->post('login', 'Api\AuthApi::login');    // Mengarah ke Controller AuthApi fungsi login
+    $routes->post('register', 'Api\AuthApi::register'); // Mengarah ke Controller AuthApi fungsi register
+    
+    // Resource yang sudah Anda punya
     $routes->resource('konser', ['controller' => 'Api\KonserApi']);
+
+    
+    // TAMBAHKAN INI UNTUK ORDER
+    $routes->get('orders/user/(:num)', 'Api\OrderApi::userOrders/$1'); // Ambil pesanan milik user tertentu
+    $routes->resource('orders', ['controller' => 'Api\OrderApi']);    // CRUD Order (Index, Create, Update, Delete)
+    $routes->get('users','Api\AuthApi::allUsers'); // Endpoint untuk mendapatkan daftar semua user (admin saja)
 });
+
+
+// IMAGE ROUTE - OUTSIDE API for Flutter CORS (gets global filter + manual headers)
+$routes->get('image/(:any)', 'Konser::image/$1');
+

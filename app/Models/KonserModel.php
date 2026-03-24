@@ -14,6 +14,7 @@ class KonserModel extends Model
         'tanggal',
         'harga',
         'jumlah_bed',
-        'gambar'
+        'gambar',
+        'description'
     ];
 }

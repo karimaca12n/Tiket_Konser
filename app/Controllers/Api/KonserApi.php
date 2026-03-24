@@ -3,122 +3,131 @@
 namespace App\Controllers\Api;
 
 use CodeIgniter\RESTful\ResourceController;
+use App\Models\KonserModel;
 
 class KonserApi extends ResourceController
 {
     protected $modelName = 'App\Models\KonserModel';
     protected $format    = 'json';
 
-    // GET: api/konser
+    // ============================================================
+    // GET ALL KONSER (Untuk Home & Admin List)
+    // ============================================================
     public function index()
     {
         $data = $this->model->findAll();
-
-        return $this->respond([
-            'status' => 200,
-            'data'   => $data
-        ]);
+        return $this->respond($data);
     }
 
-    // GET: api/konser/1
+    // ============================================================
+    // GET DETAIL KONSER
+    // ============================================================
     public function show($id = null)
     {
         $data = $this->model->find($id);
-
         if (!$data) {
             return $this->failNotFound('Data konser tidak ditemukan');
         }
-
-        return $this->respond([
-            'status' => 200,
-            'data'   => $data
-        ]);
+        return $this->respond($data);
     }
 
-    // POST: api/konser
+    // ============================================================
+    // ADD KONSER (POST) - Sinkron dengan Admin::store
+    // ============================================================
     public function create()
     {
-        $rules = [
-            'name_konser' => 'required',
-            'lokasi'      => 'required',
-            'tanggal'     => 'required',
-            'harga'       => 'required',
-            'jumlah_bed'  => 'required'
+        $fileGambar = $this->request->getFile('gambar');
+        $namaFile   = null;
+
+        if ($fileGambar && $fileGambar->isValid() && !$fileGambar->hasMoved()) {
+            $namaFile = $fileGambar->getRandomName();
+            $fileGambar->move('uploads/gambar', $namaFile);
+        }
+
+        $data = [
+            'name_konser' => $this->request->getVar('name_konser'),
+            'lokasi'      => $this->request->getVar('lokasi'),
+            'tanggal'     => $this->request->getVar('tanggal'),
+            'harga'       => $this->request->getVar('harga'),
+            'jumlah_bed'  => $this->request->getVar('jumlah_bed') ?? 0,
+            'gambar'      => $namaFile,
+            'description' => $this->request->getVar('description'), // MENANGKAP DESKRIPSI
         ];
 
-        if (!$this->validate($rules)) {
-            return $this->fail($this->validator->getErrors());
+        if ($this->model->insert($data)) {
+            return $this->respondCreated([
+                'status'  => 201,
+                'message' => 'Konser berhasil ditambahkan melalui API'
+            ]);
         }
 
-        $file = $this->request->getFile('gambar');
-        $namaGambar = null;
-
-        if ($file && $file->isValid() && !$file->hasMoved()) {
-            $namaGambar = $file->getRandomName();
-            $file->move('uploads/gambar', $namaGambar);
-        }
-
-        $this->model->save([
-            'name_konser' => $this->request->getVar('name_konser'),
-            'lokasi'      => $this->request->getVar('lokasi'),
-            'tanggal'     => $this->request->getVar('tanggal'),
-            'harga'       => $this->request->getVar('harga'),
-            'jumlah_bed'  => $this->request->getVar('jumlah_bed'),
-            'gambar'      => $namaGambar
-        ]);
-
-        return $this->respondCreated([
-            'status'  => 201,
-            'message' => 'Konser berhasil ditambahkan'
-        ]);
+        return $this->fail('Gagal menambahkan konser melalui API');
     }
 
-    // PUT: api/konser/1
+    // ============================================================
+    // UPDATE KONSER (POST dengan _method=PUT) - Sinkron dengan Admin::update
+    // ============================================================
     public function update($id = null)
     {
-        $data = $this->model->find($id);
-
-        if (!$data) {
-            return $this->failNotFound('Data konser tidak ditemukan');
+        $konserLama = $this->model->find($id);
+        if (!$konserLama) {
+            return $this->failNotFound('Data tidak ditemukan');
         }
 
-        $file = $this->request->getFile('gambar');
-        $namaGambar = $data['gambar']; // pakai gambar lama
+        $fileGambar = $this->request->getFile('gambar');
+        $namaFile   = $konserLama['gambar'];
 
-        if ($file && $file->isValid() && !$file->hasMoved()) {
-            $namaGambar = $file->getRandomName();
-            $file->move('uploads/gambar', $namaGambar);
+        if ($fileGambar && $fileGambar->isValid() && !$fileGambar->hasMoved()) {
+            $namaBaru = $fileGambar->getRandomName();
+            $fileGambar->move('uploads/gambar', $namaBaru);
+
+            // Hapus gambar lama jika ada
+            if ($konserLama['gambar'] && file_exists('uploads/gambar/' . $konserLama['gambar'])) {
+                unlink('uploads/gambar/' . $konserLama['gambar']);
+            }
+
+            $namaFile = $namaBaru;
         }
 
-        $this->model->update($id, [
+        $data = [
             'name_konser' => $this->request->getVar('name_konser'),
             'lokasi'      => $this->request->getVar('lokasi'),
             'tanggal'     => $this->request->getVar('tanggal'),
             'harga'       => $this->request->getVar('harga'),
-            'jumlah_bed'  => $this->request->getVar('jumlah_bed'),
-            'gambar'      => $namaGambar
-        ]);
+            'jumlah_bed'  => $this->request->getVar('jumlah_bed') ?? 0,
+            'gambar'      => $namaFile,
+            'description' => $this->request->getVar('description'), // MENANGKAP DESKRIPSI
+        ];
 
-        return $this->respond([
-            'status'  => 200,
-            'message' => 'Konser berhasil diupdate'
-        ]);
+        if ($this->model->update($id, $data)) {
+            return $this->respond([
+                'status'  => 200,
+                'message' => 'Konser berhasil diupdate melalui API'
+            ]);
+        }
+
+        return $this->fail('Gagal update konser melalui API');
     }
 
-    // DELETE: api/konser/1
+    // ============================================================
+    // DELETE KONSER - Sinkron dengan Admin::delete
+    // ============================================================
     public function delete($id = null)
     {
         $data = $this->model->find($id);
-
         if (!$data) {
-            return $this->failNotFound('Data konser tidak ditemukan');
+            return $this->failNotFound('Data tidak ditemukan');
         }
 
-        $this->model->delete($id);
+        // Hapus file gambar
+        if ($data['gambar'] && file_exists('uploads/gambar/' . $data['gambar'])) {
+            unlink('uploads/gambar/' . $data['gambar']);
+        }
 
-        return $this->respondDeleted([
-            'status'  => 200,
-            'message' => 'Konser berhasil dihapus'
-        ]);
+        if ($this->model->delete($id)) {
+            return $this->respondDeleted(['message' => 'Konser berhasil dihapus']);
+        }
+
+        return $this->fail('Gagal menghapus konser');
     }
 }

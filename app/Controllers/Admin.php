@@ -81,6 +81,7 @@ class Admin extends BaseController
             'harga'       => $this->request->getPost('harga'),
             'jumlah_bed'  => $this->request->getPost('jumlah_bed'),
             'gambar'      => $namaFile,
+            'description' => $this->request->getPost('description'),
         ]);
 
         return redirect()->to('/admin')
@@ -125,6 +126,7 @@ class Admin extends BaseController
             'harga'       => $this->request->getPost('harga'),
             'jumlah_bed'  => $this->request->getPost('jumlah_bed'),
             'gambar'      => $namaFile,
+            'description' => $this->request->getPost('description'),
         ]);
 
         return redirect()->to('/admin')
