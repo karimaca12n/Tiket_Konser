@@ -92,6 +92,9 @@
     <div class="content">
         <div class="left">
             <div class="info">
+                <span class="label">Nama Pemesan</span>: <?= $p['nama'] ?>
+            </div>
+            <div class="info">
                 <span class="label">Nama Konser</span>: <?= $p['name_konser'] ?>
             </div>
             <div class="info">

@@ -192,6 +192,33 @@ class Pemesanan extends BaseController {
     }
 
     // =======================
+    // Download tiket
+    // =======================
+    public function downloadTicket($id = null)
+{
+    $model = new \App\Models\PemesananModel();
+    // Gunakan method yang Anda punya untuk ambil detail
+    $pesanan = $model->getDetailWithKonser($id); 
+
+    if (!$pesanan) {
+        return "Data tidak ditemukan";
+    }
+
+    // Load view HTML tiket Anda
+    $html = view('pemesanan/Tiket_Pdf', ['p' => $pesanan]);
+
+    $dompdf = new \Dompdf\Dompdf();
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+    
+    // Kirim PDF langsung ke browser tanpa attachment agar langsung tampil
+    header('Content-Type: application/pdf');
+    echo $dompdf->output();
+    exit;
+}
+
+    // =======================
     // API - CEK STATUS
     // =======================
     public function api_status($id)

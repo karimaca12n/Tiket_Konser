@@ -10,77 +10,99 @@ class AuthApi extends ResourceController
 
     public function login()
     {
-        // 1. Ambil data yang dikirim oleh Flutter
         $email    = $this->request->getVar('email');
         $password = $this->request->getVar('password');
 
-        // 2. Hubungkan ke database
         $db      = \Config\Database::connect();
         $builder = $db->table('users');
+        $user    = $builder->where('email', $email)->get()->getRow();
 
-        // 3. Cari user berdasarkan email
-        $user = $builder->where('email', $email)->get()->getRow();
-
-        // 4. Cek apakah user ditemukan
-        if ($user) {
-            // 5. Verifikasi password (mencocokkan password input dengan hash di DB)
-            if (password_verify($password, $user->password)) {
-                
-                // LOGIN BERHASIL
-                return $this->respond([
-                    'status' => 200,
-                    'message' => 'Login berhasil',
-                    'id'    => $user->id,
-                    'name'  => $user->nama,   // Mengambil kolom 'nama' dari DB
-                    'email' => $user->email,
-                    'role'  => $user->role,   // Mengambil 'admin' atau 'user' dari DB
-                    'token' => 'token_' . bin2hex(random_bytes(16)) // Simulasi token
-                ], 200);
-            }
+        if ($user && password_verify($password, $user->password)) {
+            return $this->respond([
+                'status'  => 200,
+                'message' => 'Login berhasil',
+                'id'      => $user->id,
+                'name'    => $user->nama,   
+                'email'   => $user->email,
+                'role'    => $user->role,
+                'avatar'  => $user->avatar, // Tambahkan avatar di sini
+                'token'   => 'token_' . bin2hex(random_bytes(16))
+            ], 200);
         }
 
-        // 6. Jika gagal (user tidak ada atau password salah)
         return $this->failUnauthorized('Email atau Password salah');
     }
 
     public function register()
     {
-        // 1. Hubungkan ke database
         $db = \Config\Database::connect();
-        $builder = $db->table('users');
-
-        // 2. Ambil data dari request Flutter
         $data = [
             'nama'       => $this->request->getVar('nama'),
             'username'   => $this->request->getVar('username'),
             'email'      => $this->request->getVar('email'),
-            // Hash password agar aman
             'password'   => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
             'role'       => $this->request->getVar('role') ?? 'user',
             'created_at' => date('Y-m-d H:i:s'),
         ];
 
-        // 3. Eksekusi simpan ke database
-        if ($builder->insert($data)) {
+        if ($db->table('users')->insert($data)) {
             return $this->respondCreated([
                 'status'  => 201,
-                'message' => 'User registered successfully',
-                'data'    => [
-                    'nama'  => $data['nama'],
-                    'email' => $data['email']
-                ]
+                'message' => 'User registered successfully'
             ]);
-        } else {
-            return $this->fail('Gagal melakukan registrasi ke database');
         }
+        return $this->fail('Gagal melakukan registrasi');
     }
 
-    // Endpoint tambahan untuk admin agar bisa melihat semua user
-    public function allUsers()
-{
+    // FUNGSI UPDATE PROFILE (Wajib untuk fitur Edit Profile Flutter)
+    public function update($id = null)
+    {
         $db = \Config\Database::connect();
         $builder = $db->table('users');
-        $builder->select('id, nama as name, email, role'); // Samakan nama field agar Flutter tidak bingung
+        $user = $builder->where('id', $id)->get()->getRow();
+
+        if (!$user) return $this->failNotFound('User tidak ditemukan');
+
+        $fileAvatar = $this->request->getFile('avatar');
+        $namaFile = $user->avatar;
+
+        if ($fileAvatar && $fileAvatar->isValid() && !$fileAvatar->hasMoved()) {
+            $namaFile = $fileAvatar->getRandomName();
+            $fileAvatar->move('uploads/profile', $namaFile);
+            
+            // Hapus foto lama jika ada
+            if ($user->avatar && file_exists('uploads/profile/' . $user->avatar)) {
+                unlink('uploads/profile/' . $user->avatar);
+            }
+        }
+
+        $data = [
+            'nama'   => $this->request->getVar('nama'),
+            'avatar' => $namaFile
+        ];
+
+        if ($builder->where('id', $id)->update($data)) {
+            $updatedUser = $builder->where('id', $id)->get()->getRow();
+            return $this->respond([
+                'status' => 200,
+                'message' => 'Profile updated',
+                'user' => [
+                    'id'    => $updatedUser->id,
+                    'name'  => $updatedUser->nama,
+                    'email' => $updatedUser->email,
+                    'role'  => $updatedUser->role,
+                    'avatar' => $updatedUser->avatar
+                ]
+            ]);
+        }
+        return $this->fail('Update failed');
+    }
+
+    public function allUsers()
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('users');
+        $builder->select('id, nama as name, email, role, avatar'); 
         return $this->respond($builder->get()->getResult());
     }
 }

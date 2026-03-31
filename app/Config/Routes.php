@@ -75,21 +75,22 @@ $routes->get('/admin/reject/(:num)', 'Admin::reject/$1');
 // =======================
 
 $routes->group('api', function ($routes) {
-    // Tambahkan ini untuk Auth
-    $routes->post('login', 'Api\AuthApi::login');    // Mengarah ke Controller AuthApi fungsi login
-    $routes->post('register', 'Api\AuthApi::register'); // Mengarah ke Controller AuthApi fungsi register
-    
-    // Resource yang sudah Anda punya
-    $routes->resource('konser', ['controller' => 'Api\KonserApi']);
+    // 1. AUTH & USER MANAGEMENT
+    $routes->post('login', 'Api\AuthApi::login');
+    $routes->post('register', 'Api\AuthApi::register');
+    $routes->get('users', 'Api\AuthApi::allUsers');
+    $routes->post('users/(:num)', 'Api\AuthApi::update/$1');
 
-    
-    // TAMBAHKAN INI UNTUK ORDER
-    $routes->get('orders/user/(:num)', 'Api\OrderApi::userOrders/$1'); // Ambil pesanan milik user tertentu
-    $routes->resource('orders', ['controller' => 'Api\OrderApi']);    // CRUD Order (Index, Create, Update, Delete)
-    $routes->get('users','Api\AuthApi::allUsers'); // Endpoint untuk mendapatkan daftar semua user (admin saja)
+    // 2. ORDER CUSTOM ROUTES (WAJIB DI ATAS RESOURCE 'orders')
+    // Letakkan rute custom sebelum rute resource agar tidak dianggap sebagai ID
+    $routes->get('orders/cetak/(:num)', 'Api\OrderApi::cetak/$1');
+    $routes->get('orders/user/(:num)', 'Api\OrderApi::userOrders/$1');
+    $routes->get('orders/download/(:num)', 'Api\OrderApi::downloadTicket/$1');
+
+    // 3. RESOURCE ROUTES
+    $routes->resource('konser', ['controller' => 'Api\KonserApi']);
+    $routes->resource('orders', ['controller' => 'Api\OrderApi']);
 });
 
-
-// IMAGE ROUTE - OUTSIDE API for Flutter CORS (gets global filter + manual headers)
+// 4. EXTERNAL ROUTES
 $routes->get('image/(:any)', 'Konser::image/$1');
-
