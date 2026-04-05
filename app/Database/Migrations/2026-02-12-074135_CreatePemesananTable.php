@@ -35,7 +35,7 @@ class CreatePemesananTable extends Migration
             ],
             'status' => [
                 'type' => 'ENUM',
-                'constraint' => ['pending', 'paid', 'approved', 'cancelled'],
+                'constraint' => ['pending', 'paid', 'approved', 'rejected'],
                 'default' => 'pending',
             ],
             'approved_at' => [
